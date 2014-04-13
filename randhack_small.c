@@ -1,3 +1,7 @@
+/* Matt Davis (enferex) <mattdavis9@gmail.com>
+ * August 2013
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
