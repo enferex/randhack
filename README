@@ -1,0 +1,43 @@
+randhack
+========
+This is a proof of concept program that can access glibc's randtbl used for
+generating pseudo-random values.
+
+This table might exist at an randomized address in the process' memory space.
+Calling srand() calls a glibc wrapper that eventually calls _random_r().
+_random_r() takes as input a pointer to unsafe_state which is a glibc data
+structure that has pointers to randtbl.  _random_r() returns immediately and
+control eventually returns to srand's wrapper, then to srand(), and finally the
+calling program.
+
+For a 64-bit x86 compiled with particular GCC versions, the rdi register, after
+calling srand(,) is never clobbered and thus the pointer to unsafe_state is
+available to the user program via the rdi register.
+
+A keen user can read rdi immediately after calling srand() and access
+unsafe_state and the randtbl.  Zeroing this table will make rand() and any calls
+from rand() via fork() return a deterministic value of '0'  Future calls to
+srand() will reset the table.
+
+
+Files
+=====
+randhack.c: Example program which demonstrates by calling fork() to show that
+clones/forked processes will also share the same (compromised) randtbl in the
+shared memory space.
+
+randhack_small.c: Smaller version of the latter, for publication/slides.
+                  Does not have a fork() test.
+
+
+Shouts
+======
+Hakin9 Magazine <hakin9.org>
+2600 Magazine <2600.com>
+Ruxcon <ruxcon.org.au>,
+Hushcon <hushcon.com>
+
+
+Contact
+=======
+mattdavis9@gmail.com (enferex)
